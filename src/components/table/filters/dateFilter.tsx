@@ -47,6 +47,25 @@ export function DateFilter({ className }: DatePickerWithRangeProps) {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
+  // ⬇️ keep local state in sync with the URL
+  const spStart = searchParams.get("start");
+  const spEnd = searchParams.get("end");
+
+  React.useEffect(() => {
+    if (spStart && spEnd) {
+      const from = new Date(spStart);
+      const to = new Date(spEnd);
+      // avoid setting if it's already the same range
+      const same =
+        date?.from?.toDateString() === from.toDateString() &&
+        date?.to?.toDateString() === to.toDateString();
+      if (!same) setDate({ from, to });
+    } else if (date) {
+      setDate(undefined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spStart, spEnd]); // depend on URL values only
+
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>

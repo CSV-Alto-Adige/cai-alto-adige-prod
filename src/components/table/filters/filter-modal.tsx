@@ -15,7 +15,7 @@ import {
   Slider,
 } from "@nextui-org/react";
 import { SearchIcon, Undo } from "lucide-react";
-import { startTransition, useCallback, useState } from "react";
+import { startTransition, useCallback, useEffect, useState } from "react";
 import { Activity } from "../../../../types";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
@@ -50,6 +50,27 @@ export default function FilterModal({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // ⬇️ Rehydrate local UI state from URL, including after a reset
+  const spSez = searchParams.get("sezione");
+  const spGrp = searchParams.get("gruppo");
+  const spDiff = searchParams.get("difficolta");
+  const spElevMin = searchParams.get("elevMin");
+  const spElevMax = searchParams.get("elevMax");
+
+  useEffect(() => {
+    setOrganizerFilter(new Set(spSez ? spSez.split(",") : []));
+    setTargetGroupFilter(new Set(spGrp ? spGrp.split(",") : []));
+    setDifficultyFilter(new Set(spDiff ? spDiff.split(",") : []));
+    if (spElevMin !== null || spElevMax !== null) {
+      const min = spElevMin ? Number(spElevMin) : 0;
+      const max = spElevMax ? Number(spElevMax) : 3000;
+      setElevationGainRange([min, max]);
+    } else {
+      setElevationGainRange([0, 3000]);
+    }
+  }, [spSez, spGrp, spDiff, spElevMin, spElevMax]);
+
   const [organizerFilter, setOrganizerFilter] = useState(new Set());
   const [targetGroupFilter, setTargetGroupFilter] = useState(new Set());
   const [difficultyFilter, setDifficultyFilter] = useState(new Set());
@@ -280,7 +301,7 @@ export default function FilterModal({
                 step={50}
                 minValue={0}
                 maxValue={3000}
-                defaultValue={[0, 3000]}
+                // defaultValue={[0, 3000]}
                 formatOptions={{ style: "unit", unit: "meter" }}
                 size="sm"
                 showOutline
