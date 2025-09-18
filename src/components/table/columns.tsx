@@ -20,7 +20,7 @@ export const columns: ColumnDef<Activity>[] = [
           new Date(date as string | number | Date),
           "dd/MM/yyyy"
         );
-        return <div className="font-medium">{formatted}</div>;
+        return <div className="text-left font-medium">{formatted}</div>;
       }
       return null;
     },
